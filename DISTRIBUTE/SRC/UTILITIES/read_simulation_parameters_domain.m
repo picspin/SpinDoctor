@@ -54,7 +54,7 @@ tline = fgetl(fid);
 create_geom = sscanf(tline,'%f',1);
 
 tline = fgetl(fid);
-[strpos] = regexp(tline,"'");
+[strpos] = regexp(tline,'''');
 fname_geom = tline(strpos(1)+1:strpos(2)-1);
 
 tline = fgetl(fid);

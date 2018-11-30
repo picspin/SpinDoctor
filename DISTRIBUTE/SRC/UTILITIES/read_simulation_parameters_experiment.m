@@ -65,7 +65,7 @@ tline = fgetl(fid);
 const_q = sscanf(tline,'%f',1);
 
 tline = fgetl(fid);
-[strpos] = regexp(tline,"'");
+[strpos] = regexp(tline,'''');
 tetgen_cmd = tline(strpos(1)+1:strpos(2)-1);
 
 fclose(fid);

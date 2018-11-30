@@ -8,8 +8,8 @@ ncolor = length(colorvec_cell);
 
 SEQ_DEFINITIONS
 
-fname_domain = 'InputFiles_Simulation\simulation_parameters_domain.in';
-fname_experiment = 'InputFiles_Simulation\simulation_parameters_experiment.in';
+fname_domain = 'InputFiles_Simulation/simulation_parameters_domain.in';
+fname_experiment = 'InputFiles_Simulation/simulation_parameters_experiment.in';
 
 [cell_shape,Rratio_nucleus,dcoeff_nucleus,dcoeff_cytoplasm,dcoeff_exterior,...
     ic_nucleus,ic_cytoplasm,ic_exterior,ic_llimit,ic_ulimit,kappa_nc,kappa_ce,include_box,box_gap,...

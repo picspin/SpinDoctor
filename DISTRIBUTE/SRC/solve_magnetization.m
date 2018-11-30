@@ -66,8 +66,7 @@ nb = size(qvalues,2);
 for icmpt = 1:Ncmpt
     disp(['Working on cmpt ', num2str(icmpt)]);
     coordinates = Pts_cmpt_reorder{icmpt}; 
-    elements = Ele_cmpt_reorder{icmpt}; 
-    
+    elements = Ele_cmpt_reorder{icmpt};    
     facets = [];
     GX = -sqrt(-1)*UG*coordinates;
     FEM_MAT{icmpt}.Q = sparse(length(coordinates),length(coordinates));
@@ -75,16 +74,14 @@ for icmpt = 1:Ncmpt
         neumann = Fac_boundary_reorder{icmpt}{iboundary}';
         neumann_nodes=unique(neumann);
         coeffs_flux_matrix=zeros(max(neumann_nodes),1);
-        coeffs_flux_matrix(neumann_nodes)=kappa_vec(iboundary);
-        
+        coeffs_flux_matrix(neumann_nodes)=kappa_vec(iboundary);      
         if ~isempty(neumann)
             FEM_MAT{icmpt}.Q = FEM_MAT{icmpt}.Q + flux_matrixP1_3D(neumann,coordinates',coeffs_flux_matrix);
         end;
     end;
     [FEM_MAT{icmpt}.K,volumes]=stiffness_matrixP1_3D(elements',coordinates',DIFF_cmpts(icmpt));
     FEM_MAT{icmpt}.M=mass_matrixP1_3D(elements',volumes);
-    FEM_MAT{icmpt}.A=mass_matrixP1_3D(elements',volumes,GX');
-    
+    FEM_MAT{icmpt}.A=mass_matrixP1_3D(elements',volumes,GX');    
 end
 
 

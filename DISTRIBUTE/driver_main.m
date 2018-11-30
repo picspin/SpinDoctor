@@ -3,6 +3,8 @@ clear;
 addpath SRC
 addpath SRC/PDE SRC/DMRI SRC/FEM SRC/GEOMETRY SRC/TETGEN SRC/UTILITIES
 
+addpath COMPUTE_mesh_normals/COMPUTE_mesh_normals
+
 mydefinitions;
 ncolor = length(colorvec_cell);
 
@@ -36,7 +38,7 @@ else
     fname = [cell_shape_name,num2str(ncell),'_R',num2str(Rmean)];
 end
 
-fname_cells_description = ['InputFiles_Geometry\',fname,'_description.in'];
+fname_cells_description = ['InputFiles_Geometry/',fname,'_description.in'];
 
 if (create_geom == 0)
 else
@@ -48,7 +50,7 @@ else
     end
 end
 
-fname_tetgen = ['InputFiles_Tetgen\',fname,'_',box_str];
+fname_tetgen = ['InputFiles_Tetgen/',fname,'_',box_str];
 
 [fname_tetgen_femesh] = create_cells_femesh(fname_cells_description,fname_tetgen,...
     include_box,box_gap,Rratio_nucleus,cell_shape_name,Htetgen,tetgen_cmd);

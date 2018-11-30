@@ -64,29 +64,23 @@ for icmpt = 1:Ncmpt
     FEM_Q = model_FEM_matrices{icmpt}.Q;
     FEM_G = DIFF_cmpts(icmpt)*model_FEM_matrices{icmpt}.G;
      
-    for iboundary = 1:1%1:Nboundary
+    for iboundary = 1:Nboundary
         neumann = Fac_boundary_reorder{icmpt}{iboundary}';
 
-        size(neumann)
         coordinates_t=coordinates';
         coordVERTICES(1:size(neumann,1),1:3,1)=coordinates_t(neumann(:,1),:);
         coordVERTICES(1:size(neumann,1),1:3,2)=coordinates_t(neumann(:,2),:);
         coordVERTICES(1:size(neumann,1),1:3,3)=coordinates_t(neumann(:,3),:);
         
-%         coordVERTICES
-%         figure;
-%         PLOT_3D_stl_patch(coordVERTICES,[0 0 1])
-%         stop
-        
         [coordNORMALSnew,coordVERTICESnew] = COMPUTE_mesh_normals(coordVERTICES);
 
-%         mycoeff = (coordNORMALSnew(:,1)*UG(1) + coordNORMALSnew(:,2)*UG(2)+coordNORMALSnew(:,3)*UG(3));
+        mycoeff = (coordNORMALSnew(:,1)*UG(1) + coordNORMALSnew(:,1)*UG(2)+region.nz*UG(3));
         %Save the mesh to a new stl file:
         %WRITE_stl('sample2.stl',coordVERTICESnew,coordNORMALSnew)
 
         %Plot the mesh with the normals:
-        figure;
-        PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)
+%         figure;
+%         PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)
         
     end;
         

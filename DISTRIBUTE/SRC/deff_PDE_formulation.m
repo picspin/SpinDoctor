@@ -58,44 +58,72 @@ for icmpt = 1:Ncmpt
     elements = Ele_cmpt_reorder{icmpt};    
     
     % The 6 FE matrices can be obtained in the following way.
-    % FEM_M = model_FEM_matrices{icmpt}.M;
+    FEM_M = model_FEM_matrices{icmpt}.M;
     % FEM_K = model_FEM_matrices{icmpt}.K;
     FEM_A = model_FEM_matrices{icmpt}.A;
     FEM_Q = model_FEM_matrices{icmpt}.Q;
     FEM_G = DIFF_cmpts(icmpt)*model_FEM_matrices{icmpt}.G;
      
-    for iboundary = 1:1%1:Nboundary
-        neumann = Fac_boundary_reorder{icmpt}{iboundary}';
-
-        size(neumann)
-        coordinates_t=coordinates';
-        coordVERTICES(1:size(neumann,1),1:3,1)=coordinates_t(neumann(:,1),:);
-        coordVERTICES(1:size(neumann,1),1:3,2)=coordinates_t(neumann(:,2),:);
-        coordVERTICES(1:size(neumann,1),1:3,3)=coordinates_t(neumann(:,3),:);
-        
-%         coordVERTICES
-%         figure;
-%         PLOT_3D_stl_patch(coordVERTICES,[0 0 1])
-%         stop
-        
-        [coordNORMALSnew,coordVERTICESnew] = COMPUTE_mesh_normals(coordVERTICES);
-
-%         mycoeff = (coordNORMALSnew(:,1)*UG(1) + coordNORMALSnew(:,2)*UG(2)+coordNORMALSnew(:,3)*UG(3));
-        %Save the mesh to a new stl file:
-        %WRITE_stl('sample2.stl',coordVERTICESnew,coordNORMALSnew)
-
-        %Plot the mesh with the normals:
-        figure;
-        PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)
-        
-    end;
-        
-    
-%     coeff = (region.nx*UG(1) + region.ny*UG(2)+region.nz*UG(3));
 %     model_FEM_matrices{icmpt}.G
     [FEM_K,volumes]=stiffness_matrixP1_3D(elements',coordinates',DIFF_cmpts(icmpt));
-    FEM_M=mass_matrixP1_3D(elements',volumes);
+    M=mass_matrixP1_3D(elements',volumes);
     sum(sum((FEM_M-M).^2))
+   
+    MyQ=sparse(FEM_M);
+    
+    for iboundary = 1:Nboundary
+        neumann = Fac_boundary_reorder{icmpt}{iboundary}';
+        
+        if sum(size(neumann))>0
+            coordinates_t=coordinates';
+            coordVERTICES(1:size(neumann,1),1:3,1)=coordinates_t(neumann(:,1),:);
+            coordVERTICES(1:size(neumann,1),1:3,2)=coordinates_t(neumann(:,2),:);
+            coordVERTICES(1:size(neumann,1),1:3,3)=coordinates_t(neumann(:,3),:);
+            [coordNORMALSnew,coordVERTICESnew] = COMPUTE_mesh_normals(coordVERTICES);
+        
+            ALL_VERTICES(1:size(elements,2),1:3,1)=coordinates_t(elements(1,:),:);
+            ALL_VERTICES(1:size(elements,2),1:3,2)=coordinates_t(elements(2,:),:);
+            ALL_VERTICES(1:size(elements,2),1:3,3)=coordinates_t(elements(3,:),:);        
+            ALL_VERTICES(1:size(elements,2),1:3,4)=coordinates_t(elements(4,:),:);        
+
+            midpoint_facet_coords = mean(coordVERTICES(:,:,:),3);
+            midpoint_ele_coords = mean(ALL_VERTICES(:,:,:),3);
+            for ifacet=1:size(midpoint_facet_coords,1)
+              % find the ending point of the normal of each facet
+              endpoint_of_normal = midpoint_facet_coords(ifacet,:) + coordNORMALSnew(ifacet,:);
+              % compare the position of the ending point of the normal to the
+              % facet
+              endpoint_eval =   coordNORMALSnew(ifacet,1)*(endpoint_of_normal(1)-midpoint_facet_coords(ifacet,1))+...
+                                coordNORMALSnew(ifacet,2)*(endpoint_of_normal(2)-midpoint_facet_coords(ifacet,2))+...
+                                coordNORMALSnew(ifacet,3)*(endpoint_of_normal(3)-midpoint_facet_coords(ifacet,3));
+
+              % find the closest element to the ending point of the normal  
+              d=sum((midpoint_ele_coords-ones(size(midpoint_ele_coords,1),1)*midpoint_facet_coords(ifacet,:)).^2,2);
+              [mval,mid]=min(d);
+              closestpoint_to_normal = midpoint_ele_coords(mid,:);
+
+              % compare the position of the closest point to the facet
+              closestpoint_eval = coordNORMALSnew(ifacet,1)*(closestpoint_to_normal(1)-midpoint_facet_coords(ifacet,1))+...
+                                  coordNORMALSnew(ifacet,2)*(closestpoint_to_normal(2)-midpoint_facet_coords(ifacet,2))+...
+                                  coordNORMALSnew(ifacet,3)*(closestpoint_to_normal(3)-midpoint_facet_coords(ifacet,3));
+              normal_orientation=(endpoint_eval*closestpoint_eval);
+              coordNORMALSnew(ifacet,:) =sign(-normal_orientation)*coordNORMALSnew(ifacet,:);
+            end;
+            if (1==2)
+                figure;
+                PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)      
+            end;
+            
+            mycoeff = (coordNORMALSnew(:,1)*UG(1) + coordNORMALSnew(:,2)*UG(2)+coordNORMALSnew(:,3)*UG(3));
+%             Q=flux_matrixP1_3D(neumann,coordinates,coeffs_flux_matrix);     
+%             Q
+
+        end;
+        
+
+    end;
+        
+ 
     
     stop
     

@@ -1,4 +1,4 @@
-clear; 
+clear; clc;
 
 addpath SRC
 addpath SRC/PDE SRC/DMRI SRC/FEM SRC/GEOMETRY SRC/TETGEN SRC/UTILITIES

@@ -64,23 +64,76 @@ for icmpt = 1:Ncmpt
     FEM_Q = model_FEM_matrices{icmpt}.Q;
     FEM_G = DIFF_cmpts(icmpt)*model_FEM_matrices{icmpt}.G;
      
-    for iboundary = 1:Nboundary
+    for iboundary = 1:1%1:Nboundary
         neumann = Fac_boundary_reorder{icmpt}{iboundary}';
 
+        size(neumann)
         coordinates_t=coordinates';
         coordVERTICES(1:size(neumann,1),1:3,1)=coordinates_t(neumann(:,1),:);
         coordVERTICES(1:size(neumann,1),1:3,2)=coordinates_t(neumann(:,2),:);
         coordVERTICES(1:size(neumann,1),1:3,3)=coordinates_t(neumann(:,3),:);
         
+%         coordVERTICES
+%         figure;
+%         PLOT_3D_stl_patch(coordVERTICES,[0 0 1])
+%         stop
+        
         [coordNORMALSnew,coordVERTICESnew] = COMPUTE_mesh_normals(coordVERTICES);
 
-        mycoeff = (coordNORMALSnew(:,1)*UG(1) + coordNORMALSnew(:,1)*UG(2)+region.nz*UG(3));
+%         mycoeff = (coordNORMALSnew(:,1)*UG(1) + coordNORMALSnew(:,2)*UG(2)+coordNORMALSnew(:,3)*UG(3));
         %Save the mesh to a new stl file:
         %WRITE_stl('sample2.stl',coordVERTICESnew,coordNORMALSnew)
 
         %Plot the mesh with the normals:
 %         figure;
-%         PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)
+%         PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)        
+        VERTICES(1:size(elements,2),1:3,1)=coordinates_t(elements(1,:),:);
+        VERTICES(1:size(elements,2),1:3,2)=coordinates_t(elements(2,:),:);
+        VERTICES(1:size(elements,2),1:3,3)=coordinates_t(elements(3,:),:);        
+        VERTICES(1:size(elements,2),1:3,4)=coordinates_t(elements(4,:),:);        
+        
+        
+        midpoint_facet_coords = mean(coordVERTICES(:,:,:),3);
+        midpoint_ele_coords = mean(VERTICES(:,:,:),3);
+%         size(midpoint_ele_coords)
+%         size(midpoint_facet_coords)
+%         stop
+        normal_orientation=[];
+        for ifacet=1:size(midpoint_facet_coords,1)
+          % find the ending point of the normal of each facet
+          endpoint_of_normal = midpoint_facet_coords(ifacet,:) + coordNORMALSnew(ifacet,:);
+          % compare the position of the ending point of the normal to the
+          % facet
+          endpoint_eval =   coordNORMALSnew(ifacet,1)*(endpoint_of_normal(1)-midpoint_facet_coords(ifacet,1))+...
+                            coordNORMALSnew(ifacet,2)*(endpoint_of_normal(2)-midpoint_facet_coords(ifacet,3))+...
+                            coordNORMALSnew(ifacet,3)*(endpoint_of_normal(3)-midpoint_facet_coords(ifacet,3));
+                                
+          % find the closest element to the ending point of the normal  
+          d=sum((midpoint_ele_coords-ones(size(midpoint_ele_coords,1),1)*midpoint_facet_coords(ifacet,:)).^2,2);
+          [mval,mid]=min(d);
+          closestpoint_to_normal = midpoint_ele_coords(mid,:);
+          
+          % compare the position of the closest point to the facet
+          closestpoint_eval = coordNORMALSnew(ifacet,1)*(closestpoint_to_normal(1)-midpoint_facet_coords(ifacet,1))+...
+                              coordNORMALSnew(ifacet,2)*(closestpoint_to_normal(2)-midpoint_facet_coords(ifacet,3))+...
+                              coordNORMALSnew(ifacet,3)*(closestpoint_to_normal(3)-midpoint_facet_coords(ifacet,3));
+          normal_orientation(ifacet)=(endpoint_eval*closestpoint_eval);
+          disp([endpoint_eval closestpoint_eval endpoint_eval*closestpoint_eval]);
+%           coordNORMALSnew(ifacet,:) =sign(normal_orientation)*coordNORMALSnew(ifacet,:);
+          if (ifacet==4)
+              figure;
+              hold all;
+              plot3(closestpoint_to_normal(:,1),closestpoint_to_normal(:,2),closestpoint_to_normal(:,3),'*');
+              plot3(endpoint_of_normal(1),endpoint_of_normal(2),endpoint_of_normal(3),'o');
+             
+              facet_coors=[coordinates_t(neumann(ifacet,1),:);coordinates_t(neumann(ifacet,2),:);coordinates_t(neumann(ifacet,3),:)];
+              plot3(facet_coors([1 2 3 1],1),facet_coors([1 2 3 1],2), facet_coors([1 2 3 1],3),'r','LineWidth',5);
+              
+          end;
+        end;
+%         normal_orientation'
+        figure;
+        PLOT_3D_stl_patch(coordVERTICESnew,coordNORMALSnew)        
         
     end;
         

@@ -41,7 +41,7 @@ if (nargin<3)
     Zmassmatrix=kron(areas,reshape((ones(3)+eye(3))/12,1,9)); 
 else
     if numel(coeffs)==size(elements,1) %P0 coefficients
-        Zmassmatrix=kron(areas.*coeffs,reshape((ones(3)+eye(3))/12,1,9)); 
+        Zmassmatrix=kron(areas.*coeffs,reshape((ones(3)+eye(3))/12,1,9));    
     else %P1 coefficients
         M1=[6 2 2; 2 2 1; 2 1 2]/60;
         M2=M1([3,1,2],[3,1,2]);

@@ -97,9 +97,11 @@ for icmpt = 1:Ncmpt
     errorG=sum((MyG - FEM_G).^2);
     errorK=sum(sum((MyK - FEM_K).^2));
     errorM=sum(sum((MyM - FEM_M).^2));
-    if errorG+errorK+errorM>1e-15
+    if errorG+errorK+errorM>1e-7
         disp('Matrices are different!'); 
-        exit();
+        disp(['Error M:', num2str(errorM),', Error K:', num2str(errorK), ', Error G:', num2str(errorG)]);
+%         [full(MyG),  full(FEM_G)]
+        stop;
     end;
     disp(['Error M:', num2str(errorM),', Error K:', num2str(errorK), ', Error G:', num2str(errorG)]);
     % To replace the pde matrices

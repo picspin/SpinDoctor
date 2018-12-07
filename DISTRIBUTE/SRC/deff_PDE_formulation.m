@@ -1,8 +1,6 @@
-function [ADC_PDE_formulation,Ncmpt,DIFF_cmpts] ...
-    = deff_PDE_formulation(fname_tetgen_femesh,ncell,Rratio_nucleus,...
-    dcoeff_nucleus,dcoeff_cytoplasm,dcoeff_exterior,...
-    include_box,...
-    gdir,sdeltavec,bdeltavec,seqvec,npervec,rtol,atol)
+function [ADC_PDE_formulation, elapsed_time] ...
+    = deff_PDE_formulation(gdir,sdeltavec,bdeltavec,seqvec,npervec,rtol,atol,...
+    Ncmpt,Pts_cmpt_reorder,Ele_cmpt_reorder,DIFF_cmpts,Nboundary,Fac_boundary_reorder)
 
 % diffusion equation (zero IC) to get the time-dependent diffusion coefficient
 
@@ -12,60 +10,37 @@ global BDELTA SDELTA SEQ OGSEPER
 
 disp(['In PDE formulation']);
 
-tic
-
-disp(['Reading tetgen Mesh ', fname_tetgen_femesh]);
-
-[Pts_cmpt_reorder,Ele_cmpt_reorder,Pts_ind,Pts_boundary_reorder,Fac_boundary_reorder,...
-    Nboundary,Ncmpt] = read_tetgen_new([fname_tetgen_femesh]);
-
-DIFF_cmpts = dcoeff_cytoplasm*ones(1,Ncmpt);
-Cell_cmpt = 1:ncell;
-
-if (include_box == 1)
-    Box_cmpt = Ncmpt;
-    Box_boundary = Nboundary;
-    DIFF_cmpts(1,Box_cmpt) = dcoeff_exterior;
-    
-else
-    Box_cmpt = [];
-    Box_boundary = [];
-end
-if (Rratio_nucleus > 0)
-    Nucleus_cmpt = ncell+1:2*ncell;
-    Nucleus_boundary = ncell+1:2*ncell;
-    DIFF_cmpts(1,Nucleus_cmpt) = dcoeff_nucleus;
- 
-else
-    Nucleus_cmpt = [];
-    Nucleus_boundary = [];    
-end
 
 UG = gdir';
 UG = UG/norm(UG);
 
-[model_FEM_matrices] = deff_PDE_formulation_FEMat(Ncmpt,Pts_cmpt_reorder,Ele_cmpt_reorder,DIFF_cmpts);
 
-toc
+
+[model_FEM_matrices] = deff_PDE_formulation_FEMat(Ncmpt,Pts_cmpt_reorder,Ele_cmpt_reorder,DIFF_cmpts);
 
 for icmpt = 1:Ncmpt
     [VOL(icmpt)] ...
         = get_volume_mesh(Pts_cmpt_reorder{icmpt},Ele_cmpt_reorder{icmpt});
 end
+
+nexperi = length(sdeltavec);
+elapsed_time=zeros(Ncmpt, nexperi);
+
 for icmpt = 1:Ncmpt
 
-    coordinates = Pts_cmpt_reorder{icmpt}; 
-    elements = Ele_cmpt_reorder{icmpt};    
-    
     % The 6 FE matrices can be obtained in the following way.
     FEM_M = model_FEM_matrices{icmpt}.M;
     FEM_K = model_FEM_matrices{icmpt}.K;
     FEM_A = model_FEM_matrices{icmpt}.A;
     FEM_Q = model_FEM_matrices{icmpt}.Q;
     FEM_G = DIFF_cmpts(icmpt)*model_FEM_matrices{icmpt}.G;
-    
+     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % To replace the pde matrices
+    
+    coordinates = Pts_cmpt_reorder{icmpt}; 
+    elements = Ele_cmpt_reorder{icmpt};    
+
     [MyK,volumes]=stiffness_matrixP1_3D(elements',coordinates',DIFF_cmpts(icmpt));
     MyM=mass_matrixP1_3D(elements',volumes);   
     MyG=sparse(size(MyM,1),1);
@@ -119,15 +94,13 @@ for icmpt = 1:Ncmpt
             MyG = MyG + GG*one;
         end;
     end;
-    FEM_A
-    FEM_Q
     errorG=sum((MyG - FEM_G).^2);
     errorK=sum(sum((MyK - FEM_K).^2));
     errorM=sum(sum((MyM - FEM_M).^2));
     disp(['Error M:', num2str(errorM),', Error K:', num2str(errorK), ', Error G:', num2str(errorG)]);
     % To replace the pde matrices
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
     ODEsolve_atol = atol;
     ODEsolve_rtol = rtol;
     
@@ -135,8 +108,9 @@ for icmpt = 1:Ncmpt
         ODEsolve_rtol,'Vectorized','on','Stats','off',...
         'Jacobian',@odejac_bt_includeb);
     disp('DEFF PDE MODEL ***Uncoupled: start ode solver ode23t');
-    nexperi = length(sdeltavec);
+    nexperi = length(sdeltavec);  % Is it correct to be here???
     for iexperi = 1:nexperi
+        iex_start_time = clock;
         SDELTA = sdeltavec(iexperi);
         BDELTA = bdeltavec(iexperi);
         SEQ = seqvec(iexperi);% for choosing case PGSE, OGSEcos or OGSEsin
@@ -146,13 +120,21 @@ for icmpt = 1:Ncmpt
         TLIST = [0,SDELTA+BDELTA];
         ICC = zeros(size(FEM_M,1),1);
         sol = ode23t(@odefun_bt_includeb,TLIST,ICC,options);
-        deff_PDE_formulation_src{iexperi}{icmpt} = FEM_G.'*sol.y/VOL(icmpt)/VOL(icmpt)/DIFF_cmpts(icmpt);
-        deff_PDE_formulation_src_time{iexperi}{icmpt} = sol.x;         
-        hvec = deff_PDE_formulation_src{iexperi}{icmpt};         
+       
+        %deff_PDE_formulation_src{iexperi}{icmpt} = FEM_G.'*sol.y/VOL(icmpt)/VOL(icmpt)/DIFF_cmpts(icmpt);
+        deff_PDE_formulation_src{iexperi}{icmpt} = FEM_G.'*sol.y/VOL(icmpt)/VOL(icmpt);
+
+        deff_PDE_formulation_src_time{iexperi}{icmpt} = sol.x;
+
+        hvec = deff_PDE_formulation_src{iexperi}{icmpt};
         tvec11 = deff_PDE_formulation_src_time{iexperi}{icmpt};
         Ftvec11 = seqintprofile(tvec11);
         a = trapz(tvec11,Ftvec11.*hvec*VOL(icmpt))/trapz(tvec11,Ftvec11.^2);
-        ADC_PDE_formulation(icmpt,iexperi) = DIFF_cmpts(icmpt)*(1-a);
         
+        ADC_PDE_formulation(icmpt,iexperi) = DIFF_cmpts(icmpt)-a;
+
+        %ADC_PDE_formulation(icmpt,iexperi) = DIFF_cmpts(icmpt)*(1-a);
+        %deff_PDE_formulation_src{iexperi}{icmpt} = FEM_G.'*sol.y/VOL(icmpt)/VOL(icmpt)/DIFF_cmpts(icmpt);
+        elapsed_time(icmpt, iexperi) = etime(clock, iex_start_time);
     end
 end

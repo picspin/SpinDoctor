@@ -1,6 +1,6 @@
 function [cell_shape,Rratio_nucleus,dcoeff_nucleus,dcoeff_cytoplasm,dcoeff_exterior,...
     ic_nucleus,ic_cytoplasm,ic_exterior,ic_llimit,ic_ulimit,kappa_nc,kappa_ce,include_box,box_gap,...
-    create_geom,fname_geom,ncell,Hcyl,Rmean,Rmin,Rmax,Htetgen] ...
+    create_geom,fname_geom,ncell,Hcyl,Rmean,Rmin,Rmax,Htetgen,para_deform] ...
     = read_simulation_parameters_domain(fname_domain)
 
 ndim = 3;
@@ -54,7 +54,7 @@ tline = fgetl(fid);
 create_geom = sscanf(tline,'%f',1);
 
 tline = fgetl(fid);
-[strpos] = regexp(tline,'''');
+[strpos] = regexp(tline,"'");
 fname_geom = tline(strpos(1)+1:strpos(2)-1);
 
 tline = fgetl(fid);
@@ -70,7 +70,8 @@ Rmax = sscanf(tline,'%f',1);
 tline = fgetl(fid);
 Htetgen = sscanf(tline,'%f',1);
 
-
+tline = fgetl(fid);
+para_deform = sscanf(tline,'%f',2);
 
 fclose(fid);
     

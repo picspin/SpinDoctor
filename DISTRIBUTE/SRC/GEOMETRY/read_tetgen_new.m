@@ -1,7 +1,6 @@
-function [Pts_cmpt_reorder,Ele_cmpt_reorder,Pts_ind,Pts_boundary_reorder,Fac_boundary_reorder,...
-    Nboundary,Ncmpt] = read_tetgen_new(fname,para_deform)
+function mymesh = read_tetgen_new(fname,para_deform)
 
-
+% [Pts_cmpt_reorder,Ele_cmpt_reorder,Pts_ind,Pts_boundary_reorder,Fac_boundary_reorder, Nboundary,Ncmpt]
 
 disp(['Reading from file ',fname]);
 
@@ -12,6 +11,7 @@ if (fid ~= -1)
     Rnode = fscanf(fid, '%f', [4,inf]);
 end
 fclose(fid);
+mymesh.Nnode = Nnode;
 
 Pts_all = Rnode(2:end,:);
 
@@ -23,6 +23,8 @@ if (fid ~= -1)
     Rele = fscanf(fid, '%f', [6,inf]);
 end
 fclose(fid);
+mymesh.Nele = Nele;
+
 
 Ele_all = Rele(2:5,:);
 Ele_attrib = Rele(6,:);
@@ -34,6 +36,8 @@ if (fid ~= -1)
     Rface = fscanf(fid, '%f', [5,inf]);
 end
 fclose(fid);
+mymesh.Nface = Nface;
+
 
 Fac_all = Rface(2:4,:);
 Fac_attrib = Rface(5,:);
@@ -98,4 +102,11 @@ for icmpt = 1:Ncmpt
     end
 end
 
+mymesh.Pts_cmpt_reorder = Pts_cmpt_reorder;
+mymesh.Ele_cmpt_reorder = Ele_cmpt_reorder;
+mymesh.Pts_ind = Pts_ind;
+mymesh.Pts_boundary_reorder = Pts_boundary_reorder;
+mymesh.Fac_boundary_reorder = Fac_boundary_reorder;
+mymesh.Nboundary = Nboundary;
+mymesh.Ncmpt = Ncmpt;
 

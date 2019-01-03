@@ -28,10 +28,12 @@ function qmesh=tet_mesh_quality( node_xyz, tetra_node, is_log)
   
 %  Compute and print the quality measures.
 %
-  [ value_min, value_mean, value_max, value_var ] = ...
+  [ value_min, value_mean, value_max, value_var, tetrahedron_hout] = ...
     tet_mesh_quality1 ( node_xyz, tetra_num, ...
     tetra_node );
    qmesh.quality1=[value_min, value_mean, value_max, value_var];
+   qmesh.hout = tetrahedron_hout;
+   
   if (is_log)
       fprintf ( 1, '        1  %10f  %10f  %10f  %10f\n', ...
         value_min, value_mean, value_max, value_var );
@@ -70,12 +72,14 @@ function qmesh=tet_mesh_quality( node_xyz, tetra_node, is_log)
         value_min, value_mean, value_max, value_var );
   end;
   
-  [ value_min, value_mean, value_max, value_var ] = ...
+  [ value_min, value_mean, value_max, value_var, myvolume ] = ...
     tet_mesh_quality5 ( node_xyz, tetra_num, ...
     tetra_node );
 
    qmesh.quality5=[value_min, value_mean, value_max, value_var];
 
+   qmesh.volume = myvolume;
+   
    if (is_log)   
     fprintf ( 1, '        5  %10f  %10f  %10f  %10f\n', ...
         value_min, value_mean, value_max, value_var );
@@ -1137,7 +1141,7 @@ function node_order = tet_mesh_node_order ( tetra_order, tetra_num, ...
 
   return
 end
-function [ value_min, value_mean, value_max, value_var ] = ...
+function [ value_min, value_mean, value_max, value_var, tetrahedron_hout ] = ...
  tet_mesh_quality1 ( node_xyz, tetra_num, tetra_node )
 
 %*****************************************************************************80
@@ -1183,11 +1187,17 @@ function [ value_min, value_mean, value_max, value_var ] = ...
 %
   dim_num = 3;
   tetrahedron_quality = zeros ( tetra_num, 1 );
+  tetrahedron_hout = zeros ( tetra_num, 1 );
+  tetrahedron_hin = zeros ( tetra_num, 1 );
+  
   for tetra = 1 : tetra_num
 
     tetrahedron(1:dim_num,1:4) = node_xyz(1:dim_num,tetra_node(1:4,tetra));
-
-    tetrahedron_quality(tetra) = tetrahedron_quality1_3d ( tetrahedron );
+%     tetrahedron_quality(tetra) = tetrahedron_quality1_3d ( tetrahedron );
+    [h_out, h_in] = tetrahedron_quality1_3d ( tetrahedron );
+    tetrahedron_quality(tetra) = 3.0 * h_in / h_out;
+    tetrahedron_hout(tetra) = h_out;
+    tetrahedron_hin(tetra) = h_in;
 
   end
 
@@ -1384,7 +1394,7 @@ function [ value_min, value_mean, value_max, value_var ] = ...
 
   return
 end
-function [ value_min, value_mean, value_max, value_var ] = ...
+function [ value_min, value_mean, value_max, value_var, myvolume ] = ...
   tet_mesh_quality5 ( node_xyz, tetra_num, ...
   tetra_node )
 
@@ -1439,6 +1449,8 @@ function [ value_min, value_mean, value_max, value_var ] = ...
 
   end
 
+  myvolume = tetrahedron_quality;
+  
   volume_max = max ( tetrahedron_quality(1:tetra_num) );
 
   tetrahedron_quality(1:tetra_num) = tetrahedron_quality(1:tetra_num) ...
@@ -1647,7 +1659,7 @@ function [ r, pc ] = tetrahedron_insphere_3d ( tetra )
 
   return
 end
-function quality = tetrahedron_quality1_3d ( tetra )
+function [r_out, r_in] = tetrahedron_quality1_3d ( tetra )
 
 %*****************************************************************************80
 %
@@ -1682,7 +1694,7 @@ function quality = tetrahedron_quality1_3d ( tetra )
 
   r_in = tetrahedron_insphere_3d ( tetra );
 
-  quality = 3.0 * r_in / r_out;
+%   quality = 3.0 * r_in / r_out;
 
   return
 end

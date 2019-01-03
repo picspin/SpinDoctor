@@ -4,13 +4,13 @@ ymin=0;
 ymax=0;
 zmin=0;
 zmax=0;
-for ict = 1:Ncmpt
-    xx=max(Pts_cmpt_reorder{icmpt}(1,:));
-    yx=max(Pts_cmpt_reorder{icmpt}(2,:));
-    zx=max(Pts_cmpt_reorder{icmpt}(3,:));
-    xn=min(Pts_cmpt_reorder{icmpt}(1,:));
-    yn=min(Pts_cmpt_reorder{icmpt}(2,:));
-    zn=min(Pts_cmpt_reorder{icmpt}(3,:));
+for ict = 1:mm.Ncmpt
+    xx=max(mm.Pts_cmpt_reorder{icmpt}(1,:));
+    yx=max(mm.Pts_cmpt_reorder{icmpt}(2,:));
+    zx=max(mm.Pts_cmpt_reorder{icmpt}(3,:));
+    xn=min(mm.Pts_cmpt_reorder{icmpt}(1,:));
+    yn=min(mm.Pts_cmpt_reorder{icmpt}(2,:));
+    zn=min(mm.Pts_cmpt_reorder{icmpt}(3,:));
     xmin = min(xmin,xn);
     xmax = max(xmax,xx);
     ymin = min(ymin,yn);
@@ -23,11 +23,11 @@ cmptvec = [1:ncell];
 for ict = 1:length(cmptvec)
     icmpt = cmptvec(ict);
     Fac = [];
-    for iboundary = 1:Nboundary
-        Fac = [Fac,Fac_boundary_reorder{icmpt}{iboundary}];
+    for iboundary = 1:mm.Nboundary
+        Fac = [Fac,mm.Fac_boundary_reorder{icmpt}{iboundary}];
     end
-    h = trisurf(Fac',Pts_cmpt_reorder{icmpt}(1,:),Pts_cmpt_reorder{icmpt}(2,:),...
-        Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
+    h = trisurf(Fac',mm.Pts_cmpt_reorder{icmpt}(1,:),mm.Pts_cmpt_reorder{icmpt}(2,:),...
+        mm.Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
     set(h,'facealpha',0.9);
     axis equal;
     axis([xmin,xmax,ymin,ymax,zmin,zmax]); colorbar;
@@ -35,15 +35,15 @@ for ict = 1:length(cmptvec)
     title('Solution,last experi,last b-value');
 end
 figure; hold on;
-cmptvec = [ncell+1:Ncmpt-1];
+cmptvec = [ncell+1:mm.Ncmpt-1];
 for ict = 1:length(cmptvec)
     icmpt = cmptvec(ict);
     Fac = [];
-    for iboundary = 1:Nboundary
-        Fac = [Fac,Fac_boundary_reorder{icmpt}{iboundary}];
+    for iboundary = 1:mm.Nboundary
+        Fac = [Fac,mm.Fac_boundary_reorder{icmpt}{iboundary}];
     end
-    h = trisurf(Fac',Pts_cmpt_reorder{icmpt}(1,:),Pts_cmpt_reorder{icmpt}(2,:),...
-        Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
+    h = trisurf(Fac',mm.Pts_cmpt_reorder{icmpt}(1,:),mm.Pts_cmpt_reorder{icmpt}(2,:),...
+        mm.Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
     set(h,'facealpha',0.9);
     axis equal;
     axis([xmin,xmax,ymin,ymax,zmin,zmax]); colorbar;
@@ -52,15 +52,15 @@ for ict = 1:length(cmptvec)
 end
 
 figure;
-cmptvec = [Ncmpt];
+cmptvec = [mm.Ncmpt];
 for ict = 1:length(cmptvec)
     icmpt = cmptvec(ict);
     Fac = [];
-    for iboundary = 1:Nboundary
-        Fac = [Fac,Fac_boundary_reorder{icmpt}{iboundary}];
+    for iboundary = 1:mm.Nboundary
+        Fac = [Fac,mm.Fac_boundary_reorder{icmpt}{iboundary}];
     end
-    h = trisurf(Fac',Pts_cmpt_reorder{icmpt}(1,:),Pts_cmpt_reorder{icmpt}(2,:),...
-        Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
+    h = trisurf(Fac',mm.Pts_cmpt_reorder{icmpt}(1,:),mm.Pts_cmpt_reorder{icmpt}(2,:),...
+        mm.Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
     set(h,'facealpha',0.9);
     axis equal;
     axis([xmin,xmax,ymin,ymax,zmin,zmax]); colorbar;
@@ -102,8 +102,8 @@ title(['UG = [',mynum2str(UG),']']);
 figure;
 for iexperi = 1:nexperi
     subplot(nexperi,3,(iexperi-1)*3+1); hold on;
-    bar(1:Ncmpt,[ADC(:,iexperi)],'b');
-    bar(Ncmpt+1,ADC_allcmpts(iexperi,1),'r');
+    bar(1:mm.Ncmpt,[ADC(:,iexperi)],'b');
+    bar(mm.Ncmpt+1,ADC_allcmpts(iexperi,1),'r');
     title('ADC BT');
     set(gca,'ylim',[0,max(DIFF_cmpts)]);
     set(gca,'Ytick',linspace(0,max(DIFF_cmpts),6));
@@ -112,8 +112,8 @@ end
 
 for iexperi = 1:nexperi
     subplot(nexperi,3,(iexperi-1)*3+2); hold on;
-    bar(1:Ncmpt,ADC_PDE_formulation(:,iexperi),'b');
-    bar(Ncmpt+1,ADC_PDE_allcmpts(iexperi,1),'r');
+    bar(1:mm.Ncmpt,ADC_PDE_formulation(:,iexperi),'b');
+    bar(mm.Ncmpt+1,ADC_PDE_allcmpts(iexperi,1),'r');
     title('ADC DE');
     set(gca,'ylim',[0,max(DIFF_cmpts)]);
     set(gca,'Ytick',linspace(0,max(DIFF_cmpts),6));
@@ -122,8 +122,8 @@ end
 
 for iexperi = 1:nexperi
     subplot(nexperi,3,(iexperi-1)*3+3); hold on;
-    bar(1:Ncmpt,ADC_STA(:,iexperi),'b');
-    bar(Ncmpt+1,ADC_STA_allcmpts(iexperi,1),'r');
+    bar(1:mm.Ncmpt,ADC_STA(:,iexperi),'b');
+    bar(mm.Ncmpt+1,ADC_STA_allcmpts(iexperi,1),'r');
     title('ADC STA');
     set(gca,'ylim',[0,max(DIFF_cmpts)]);
     set(gca,'Ytick',linspace(0,max(DIFF_cmpts),6));
@@ -147,50 +147,50 @@ spy(boundary_mat_plot,'k');
 
 xlabel('iboundary'); ylabel('icmpt');
 title('Connections boundary-compartment');
-set(gca,'Ytick',[1:Ncmpt]);
-set(gca,'Xtick',[1:Nboundary]);
+set(gca,'Ytick',[1:mm.Ncmpt]);
+set(gca,'Xtick',[1:mm.Nboundary]);
 grid on;
 
 subplot(2,3,2); hold on;
-bar(1:Ncmpt,DIFF_cmpts,'b');
-bar(Ncmpt+1,ADC_free_allcmpts,'r');
+bar(1:mm.Ncmpt,DIFF_cmpts,'b');
+bar(mm.Ncmpt+1,ADC_free_allcmpts,'r');
 title('DIFF free');
 set(gca,'ylim',[0,max(DIFF_cmpts)]);
 set(gca,'Ytick',linspace(0,max(DIFF_cmpts),6));
-set(gca,'Xtick',[1:Ncmpt+1]);
+set(gca,'Xtick',[1:mm.Ncmpt+1]);
 xlabel('icmpt');
 grid on;
 
 subplot(2,3,3); hold on;
-bar(1:Nboundary,kappa_vec,'b');
+bar(1:mm.Nboundary,kappa_vec,'b');
 title('Permeability');
 set(gca,'ylim',[0,max(kappa_vec)]);
 set(gca,'Ytick',linspace(0,max(kappa_vec),6));
-set(gca,'Xtick',[1:Nboundary]);
+set(gca,'Xtick',[1:mm.Nboundary]);
 xlabel('iboundary');
 grid on;
 
 subplot(2,3,4); hold on;
-bar(1:Ncmpt,VOL,'b');
-bar(Ncmpt+1,VOL_allcmpts,'r');
+bar(1:mm.Ncmpt,VOL,'b');
+bar(mm.Ncmpt+1,VOL_allcmpts,'r');
 title('VOL');
-set(gca,'Xtick',[1:Ncmpt+1]);
+set(gca,'Xtick',[1:mm.Ncmpt+1]);
 xlabel('icmpt');
 grid on;
 
 subplot(2,3,5); hold on;
-bar(1:Ncmpt,SA,'b');
-bar(Ncmpt+1,sum(SA),'r');
+bar(1:mm.Ncmpt,SA,'b');
+bar(mm.Ncmpt+1,sum(SA),'r');
 title('Surface Area');
-set(gca,'Xtick',[1:Ncmpt+1]);
+set(gca,'Xtick',[1:mm.Ncmpt+1]);
 xlabel('icmpt');
 grid on;
 
 subplot(2,3,6); hold on;
-bar(1:Ncmpt,SAu,'b');
-bar(Ncmpt+1,sum(SAu),'r');
+bar(1:mm.Ncmpt,SAu,'b');
+bar(mm.Ncmpt+1,sum(SAu),'r');
 title('SA in U_g');
-set(gca,'Xtick',[1:Ncmpt+1]);
+set(gca,'Xtick',[1:mm.Ncmpt+1]);
 xlabel('icmpt');
 grid on;
 
@@ -200,7 +200,7 @@ for iexperi = 1:nexperi
     subplot(nexperi,2,iexperi); hold on;
     % Column 1: for deff_PDE
     % Column 2: for BT
-    bar(1:Ncmpt,[deff_PDE_elapsed_time(:,iexperi)],'b');
+    bar(1:mm.Ncmpt,[deff_PDE_elapsed_time(:,iexperi)],'b');
     title(['Timing DIFF, Experiment ',num2str(iexperi)]);
     ylabel('Timing (s)');
     xlabel('Cmpt. Index');
@@ -211,4 +211,18 @@ for iexperi = 1:nexperi
     ylabel('Timing (s)');
     xlabel('b-val. Index');
 end
+
+
+figure; hold on
+iplot = 0;
+for iexperi = 1:nexperi   
+    signal = real(MF_allcmpts(iexperi,:)./M0_allcmpts(iexperi,:));
+    bvec = bvalues(iexperi,:);
+    h = plot(bvec, signal,...
+        [colorvec_cell{1},['-',markervec_cell{iexperi}]]);
+    set(h,'MarkerSize', 10, 'LineWidth',1);
+    iplot = iplot + 1;
+    legend_vec{iplot} = [' Experi ',mynum2str(iexperi)];
+end
+
 

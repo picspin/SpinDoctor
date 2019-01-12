@@ -57,7 +57,7 @@ if (~isempty(mymesh))
 
 	if (~isempty(experiment_hadc))
 		[ADC_DE,ADC_DE_allcmpts,HADC_elapsed_time] ...
-			= HADC(experiment_hadc,mymesh,DIFF_cmpts,IC_cmpts);
+			= HADC_JRL(experiment_hadc,mymesh,DIFF_cmpts,IC_cmpts);
 		PLOT_ADC(ADC_DE,ADC_DE_allcmpts,DIFF_cmpts,'HADC');	
 		%PLOT_TIMING(HADC_elapsed_time);
 	end

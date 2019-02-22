@@ -2,7 +2,7 @@ clear all;
 format short
 
 addpath SRC msh_files
-addpath SRC/PDE SRC/DMRI SRC/FEM SRC/GEOMETRY SRC/TETGEN SRC/UTILITIES
+addpath SRC/PDE SRC/DMRI SRC/FEM SRC/GEOM SRC/TETGEN
 
 
 fname_params_cells = 'params_cells.in';

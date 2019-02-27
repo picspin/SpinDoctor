@@ -1,5 +1,5 @@
 3                                           % 1 = ellipsoids, 2 = cylinders, 3 = neuron from msh file
-'msh_files/spindle/06b_spindle8aACC'        % file name to store cell description OR file to get neuron msh data
+'msh_files/pyramidal/04a_pyramidal5aACC'        % file name to store cell description OR file to get neuron msh data
 1                                           % ncell
 1                                           % Rmin
 2                                           % Rmax

@@ -54,12 +54,6 @@ if (cell_shape == 2)
 elseif (cell_shape == 1)
     [ncell,facets_cell,facets_labels_cell,nodes_cell,pt_in_cell,center,normal,Rcell] = ...
         create_ellipses_geometry(fname_cells,Rratio_IN);
-elseif (cell_shape == 3)
-    fname_tetgen_femesh = fname_cells;
-    if (exist([fname_cells, '_elements.txt'], 'file') && exist([fname_cells, '_nodes.txt'], 'file')) == 0
-        gmsh_to_fem(fname_cells);
-    end
-    return
 end
 
 facets = [];

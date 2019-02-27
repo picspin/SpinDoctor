@@ -50,9 +50,6 @@ if (Rratio_IN <= 0 || Rratio_IN >= 1)
     elseif (cell_shape == 1)
         % for a sphere, there is one boundary
         Nboundary = ncell;
-    elseif (cell_shape == 3)
-        % for a neuron, there is one boundary
-        Nboundary = 1;
     else
         disp('wrong');
         stop
@@ -65,9 +62,6 @@ else
     elseif (cell_shape == 1)
         % for a sphere, there is the outer sphere and the inner sphere
         Nboundary = 2*ncell;
-    elseif (cell_shape == 3)
-        % for a neuron, there is one boundary
-        Nboundary = 1;
     else
         disp('wrong');
         stop
@@ -141,23 +135,6 @@ elseif (cell_shape == 1)
         if (include_ECS ~= 0)
             kappa_bdys(1,OUT_ECS_boundary) = params_domain_pde.kappa_OUT_ECS;  
         end
-    end
-    
-elseif (cell_shape == 3)
-    OUT_cmpts_index = 1:ncell;
-    IC_cmpts(1,OUT_cmpts_index) = params_domain_pde.ic_OUT;
-    DIFF_cmpts(1,OUT_cmpts_index) = params_domain_pde.dcoeff_OUT;
-    if (Rratio_IN <= 0 || Rratio_IN >= 1)        
-        OUT_ECS_boundary = [1:ncell];
-        kappa_bdys = 0; % force kappa = 0
-        IN_cmpts_index = [];        
-    else        
-        IN_cmpts_index = ncell+1:2*ncell;
-        DIFF_cmpts(1,IN_cmpts_index) = params_domain_pde.dcoeff_IN;
-        IC_cmpts(1,IN_cmpts_index) = params_domain_pde.ic_IN;        
-        IN_OUT_boundary = 2:2:2*ncell;
-        kappa_bdys = 0; % force kappa = 0
-        OUT_ECS_boundary = 1:2:2*ncell;
     end
 end
 

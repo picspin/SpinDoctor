@@ -1,4 +1,4 @@
-function PLOT_SIGNAL(bvalues,MF_allcmpts,Sig_free,ADC_allcmpts_S0,ADC_allcmpts)
+function PLOT_SIGNAL(bvalues,MF_allcmpts,Sig_free,ADC_allcmpts_S0,ADC_allcmpts,title_str)
 
 % plot signal from solving the Bloch-Torrey equation
 % 
@@ -52,3 +52,5 @@ set(legend, 'FontSize',10)
 set(gca, 'FontSize',10)
 xlabel('bvalue')
 ylabel('log10(Sig)')
+grid on;
+title([title_str]);

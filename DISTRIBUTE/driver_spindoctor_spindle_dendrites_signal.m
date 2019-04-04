@@ -32,7 +32,7 @@ else
 end
 
 if (~isempty(mymesh))
-    %PLOT_FEMESH(mymesh,OUT_cmpts_index,ECS_cmpts_index,IN_cmpts_index);
+    PLOT_FEMESH(mymesh,OUT_cmpts_index,ECS_cmpts_index,IN_cmpts_index);
     
     [experi_common,experi_hadc,experi_btpde] ...
         = read_params_simul_experi(fname_params_simul_experi);
@@ -40,7 +40,7 @@ if (~isempty(mymesh))
     [VOL_cmpts,SA_cmpts,SAu_cmpts,VOL_allcmpts,VF_cmpts,SoV_cmpts] ...
         = GET_VOL_SA(mymesh,experi_common.gdir);
     
-    PLOT_GEOMETRY_INFO(cmpts_bdys_mat,OUT_cmpts_index,IN_cmpts_index,ECS_cmpts_index,VOL_cmpts,SA_cmpts,SAu_cmpts);
+    % PLOT_GEOMETRY_INFO(cmpts_bdys_mat,OUT_cmpts_index,IN_cmpts_index,ECS_cmpts_index,VOL_cmpts,SA_cmpts,SAu_cmpts);
     
     
     

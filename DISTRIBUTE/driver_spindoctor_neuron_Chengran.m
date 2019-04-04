@@ -1,4 +1,4 @@
-clear all;
+ clear all;
 format short
 
 addpath SRC msh_files
@@ -26,11 +26,12 @@ fname_tetgen = [fname_cells];
     create_femesh_fromcells(params_cells,fname_cells,params_domain_geom,params_domain_femesh,fname_tetgen);%
 
 if params_cells.cell_shape == 3
-    mymesh = read_mesh(fname_tetgen_femesh, DIFF_cmpts(1));
+    mymesh = read_mesh_seperate(fname_tetgen_femesh, DIFF_cmpts(1));
 else 
     [mymesh,cmpts_bdys_mat] = read_tetgen(fname_tetgen_femesh,params_cells.para_deform,Ncmpt,Nboundary);
 end
-    
+
+%%
 if (~isempty(mymesh))
     PLOT_FEMESH(mymesh,OUT_cmpts_index,ECS_cmpts_index,IN_cmpts_index);
     
@@ -52,6 +53,13 @@ if (~isempty(mymesh))
                 = BTPDE(experi_btpde,mymesh,DIFF_cmpts,kappa_bdys,IC_cmpts);
             
             PLOT_MAGNETIZATION(mymesh,YOUT,OUT_cmpts_index,ECS_cmpts_index,IN_cmpts_index);
+            grid on
+            box on
+            shading interp
+            h = light;               % create a light
+            h.Position = [-20,50,100];
+            lighting flat    % preferred method for lighting curved surfaces
+            material dull    % set material to be dull, no specular highlights
             
             [ADC_cmpts,ADC_allcmpts,ADC_allcmpts_S0] = FIT_SIGNAL(MF_cmpts,MF_allcmpts,experi_btpde.bvalues);
             

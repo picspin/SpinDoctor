@@ -28,7 +28,7 @@ elements = load([fname, '_elements.txt']);
 nodes = load([fname, '_nodes.txt']);
 
 geometryFromMesh(mymodel,nodes',elements');
-pdeplot3D(mymodel);
+%pdeplot3D(mymodel);
 
 %%%%%%%%%%%%%
 specifyCoefficients(mymodel,'m',0,'d',1,'c',sigma0,'a', 0,'f',0);
@@ -38,6 +38,7 @@ for iface = 1:nface
     applyBoundaryCondition(mymodel,'neumann','face',iface,'g',1,'q',1,'Vectorized','on'); % 3-D geometry
 end
 %%%%%%%%%%%%%%
+
 
 [elems2faces, faces2nodes] = get_faces(elements);
 faces2elems=entryInWhichRows(elems2faces); 

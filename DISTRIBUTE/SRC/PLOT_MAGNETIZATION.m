@@ -55,11 +55,16 @@ if (~isempty(OUT_cmpts_index))
         end
         h = trisurf(Fac',mymesh.Pts_cmpt_reorder{icmpt}(1,:),mymesh.Pts_cmpt_reorder{icmpt}(2,:),...
             mymesh.Pts_cmpt_reorder{icmpt}(3,:),real(YOUT{end}{end}{icmpt}(:,end)));
-        set(h,'facealpha',0.6);
+        set(h,'facealpha',1);
+        set(h,'EdgeAlpha',1)
         axis equal;
-        axis([xmin,xmax,ymin,ymax,zmin,zmax]); colorbar('southoutside');
-        view(3);
-        title(['Magnetization Inner cmpts: ',num2str(OUT_cmpts_index)]);
+        xlabel('x'); ylabel('y'); zlabel('z');
+        %axis([xmin,xmax,ymin,ymax,zmin,zmax]); 
+        colorbar('Eastoutside');
+        load('02a_pyramidal2aFI_HADC_max.mat', 'dir', 'ang')
+        rotate(h,dir,ang)
+        %view(1);
+        title(['Magnetization Inner cmpts: ',num2str(OUT_cmpts_index),' (bvalue = 1000)']);
     end
 end
 

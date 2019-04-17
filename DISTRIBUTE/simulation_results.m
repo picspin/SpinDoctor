@@ -4,8 +4,8 @@ format short
 addpath SRC msh_files
 addpath SRC/PDE SRC/DMRI SRC/FEM SRC/GEOM SRC/TETGEN
 
-mat_files = {'spindle_soma_signal_d10_D43_5bvalues_180gdir.mat','spindle_dendrites_signal_d10_D43_5bvalues_180gdir.mat',...
-            'pyramidal_soma_signal_d10_D43_5bvalues_180gdir.mat', 'pyramidal_soma_signal_d10_D43_5bvalues_180gdir.mat'};
+mat_files = {'spindle_soma_signal_d10_D43_3bvalues_180gdir.mat','spindle_dendrites_signal_d10_D43_3bvalues_180gdir.mat',...
+            'pyramidal_soma_signal_d10_D43_3bvalues_180gdir.mat', 'pyramidal_soma_signal_d10_D43_3bvalues_180gdir.mat'};
 
 for ifile = 1:4
     file_name = mat_files(ifile);

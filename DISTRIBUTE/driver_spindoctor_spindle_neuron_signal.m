@@ -103,7 +103,7 @@ if (~isempty(mymesh))
             [points_gdir,SIG_BTPDE_cmpts_alldir,SIG_BTPDE_allcmpts_alldir] ...
                 = SIG_BTPDE_HARDI(experi_btpde,mymesh,DIFF_cmpts,kappa_bdys,IC_cmpts);
             ctime_btpde_hardi = cputime - t;
-            save('spindle_neuron_signal_d10_D43_5bvalues_180gdir_0')
+            save('spindle_neuron_signal_d10_D43_3bvalues_180gdir_0')
             nexperi = length(experi_btpde.sdeltavec);
             nb = size(experi_btpde.bvalues,2);
             all_sh_coeff = zeros(16, nb);
@@ -121,7 +121,7 @@ if (~isempty(mymesh))
                     % PLOT_HARDI(points_gdir,squeeze(real(SIG_BTPDE_allcmpts_alldir(:,iexperi,ib)))/S0,title_str);                   
                 end
             end
-            save('spindle_neuron_signal_d10_D43_5bvalues_180gdir')
+            save('spindle_neuron_signal_d10_D43_3bvalues_180gdir')
         end
         %HADC
         if (~isempty(experi_hadc))

@@ -1,4 +1,4 @@
-19                                              % number of gradient directions to simulate   
+42                                              % number of gradient directions to simulate   
 1 1 1                                           % (g1,g2,g3)
 1 												% nexperi
 10600                                           % Experi: smalldelta	

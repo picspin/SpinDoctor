@@ -106,7 +106,9 @@ if (~isempty(mymesh))
             [points,ADC_HADC_cmpts_alldir,ADC_HADC_allcmpts_alldir] ...
                 = HADC_HARDI(experi_hadc,mymesh,DIFF_cmpts,IC_cmpts);
             % load('pyramidal_dendrites_HADC.mat')
-            PLOT_HARDI(points,ADC_HADC_allcmpts_alldir);
+            PLOT_HARDI(points,ADC_HADC_allcmpts_alldir./DIFF_cmpts);
+            title_str = ['ADC'];
+            PLOT_HARDI_PT(points,ADC_HADC_allcmpts_alldir./DIFF_cmpts,title_str);
         end
     end
     

@@ -1,4 +1,4 @@
-function [h] = PLOT_HARDI(points,ADC_allcmpts_alldir)
+function [h] = PLOT_HARDI(points,ADC_allcmpts_alldir,fig_title)
 
 % plot ngdir original directions in which the HADC was simulated and 900 interpolated directions
 % 
@@ -20,10 +20,14 @@ ADC_interp = YY_sph*sh_coeff;
 ADC_alldir = ADC_interp.*sph_pts;
 
 figure; hold on;
-ADC_Ellipsoid = trisurf(C_sph,ADC_alldir(:,1),ADC_alldir(:,2),ADC_alldir(:,3),ADC_interp); view(3); 
+
+ADC_Ellipsoid = trisurf(C_sph,ADC_alldir(:,1),ADC_alldir(:,2),ADC_alldir(:,3),ADC_interp,'facealpha',0.6); view(3); 
+
+view(3); caxis([0,1]); 
 colorbar; axis equal;
 ADC_Ellipsoid.EdgeColor = 'none';
 xlabel('x'); ylabel('y'); zlabel('z');
-title(['ADC in ',num2str(ngdir),' directions']);
-h = plot3(ADC_allcmpts_alldir.*points(:,1),ADC_allcmpts_alldir.*points(:,2),ADC_allcmpts_alldir.*points(:,3),'k.',...
-'markersize',35);
+title(['SH Interp SIG in ',num2str(ngdir),' directions. ',fig_title]);
+
+h = plot3(ADC_allcmpts_alldir.*points(:,1),ADC_allcmpts_alldir.*points(:,2),...
+    ADC_allcmpts_alldir.*points(:,3),'k.','markersize',15);

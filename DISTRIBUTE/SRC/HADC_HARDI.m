@@ -39,7 +39,7 @@ ii = find(points(:,3) >= 0);
 % negii
 for j = 1:size(ii,1)
     for k = 1:ngdir_total
-        if (norm(points(j,1:2)-points(k,1:2)) < 1e-10  && points(j,3)+points(k,3) < 1e-10)
+        if (norm(points(j,1:2)+points(k,1:2)) < 1e-10  && points(j,3)+points(k,3) < 1e-10)
             negii(ii(j)) = k;
         end
     end
@@ -55,20 +55,35 @@ for ic = 1:size(C,1)
     end
 end
 graddir_index = ii;
+graddir_index = 1:ngdir_total;
+
 ndir = length(graddir_index);
+
+clear negii;
+for idir = 1:ndir
+    negii{idir} = [];
+end
+
 nexperi = length(experi_hadc.sdeltavec);
 
 ADC_HADC_cmpts_alldir = nan*ones(ngdir_total,Ncmpt,nexperi);
 ADC_HADC_allcmpts_alldir = nan*ones(ngdir_total,nexperi);
 for idir = 1:ndir
-    experi_hadc.gdir = points(graddir_index(idir),:)';    
+    experi_hadc.gdir = points(graddir_index(idir),:)';
+    save_mat_name = ['saved_adc_hardi_',num2str(idir),'.mat'];
+    
     [ADC_HADC_cmpts,ADC_HADC_allcmpts,HADC_elapsed_time] ...
         = HADC(experi_hadc,mymesh,DIFF_cmpts,IC_cmpts);
+    
+    eval(['save ',save_mat_name,' experi_hadc ADC_HADC_cmpts ADC_HADC_allcmpts HADC_elapsed_time']);
+    
     ADC_HADC_cmpts_alldir(graddir_index(idir),:,:) = ADC_HADC_cmpts;
-    ADC_HADC_cmpts_alldir(negii(graddir_index(idir)),:,:) = ADC_HADC_cmpts;
+    
     ADC_HADC_allcmpts_alldir(graddir_index(idir),:) = ADC_HADC_allcmpts(:,1)';
-    ADC_HADC_allcmpts_alldir(negii(graddir_index(idir)),:) = ADC_HADC_allcmpts(:,1)';
-        
+    if (~isempty(negii{idir}))
+        ADC_HADC_cmpts_alldir(negii(graddir_index(idir)),:,:) = ADC_HADC_cmpts;
+        ADC_HADC_allcmpts_alldir(negii(graddir_index(idir)),:) = ADC_HADC_allcmpts(:,1)';
+    end
 end
 ADC_HADC_cmpts_alldir(find(ADC_HADC_cmpts_alldir==0)) = nan;
 ADC_HADC_allcmpts_alldir(find(ADC_HADC_allcmpts_alldir==0)) = nan;

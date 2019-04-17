@@ -1,0 +1,10 @@
+3                                           % 1 = ellipsoids, 2 = cylinders, 3 = neuron from msh file
+'msh_files/pyramidal/02a_pyramidal2aFI'    % file name to store cell description OR file to get neuron msh data
+1                                           % ncell
+1                                           % Rmin
+2                                           % Rmax
+0.05										% Min distance between cells (times mean(Rmin,Rmax))
+0.1                                         % Max distance between cells (times the mean(Rmin,Rmax))
+0.0 0.0                                     % deform the domain, [a_bend,a_twist]
+20                                          % Hcyl (if cylinders)
+  

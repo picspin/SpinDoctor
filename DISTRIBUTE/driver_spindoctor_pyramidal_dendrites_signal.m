@@ -7,7 +7,7 @@ addpath SRC/PDE SRC/DMRI SRC/FEM SRC/GEOM SRC/TETGEN
 
 fname_params_cells = 'params_cells_pyramidal_dendrites_signal.in';
 fname_params_simul_domain  = 'params_simul_domain.in';
-fname_params_simul_experi = 'params_simul_experi_pyramidal_dendrites_signal.in';
+fname_params_simul_experi = 'params_simul_experi.in';
 
 [params_cells,fname_cells] = create_geom(fname_params_cells);
 
@@ -32,7 +32,7 @@ else
 end
 
 if (~isempty(mymesh))
-    PLOT_FEMESH(mymesh,OUT_cmpts_index,ECS_cmpts_index,IN_cmpts_index);
+    % PLOT_FEMESH(mymesh,OUT_cmpts_index,ECS_cmpts_index,IN_cmpts_index);
     
     [experi_common,experi_hadc,experi_btpde] ...
         = read_params_simul_experi(fname_params_simul_experi);
@@ -40,7 +40,7 @@ if (~isempty(mymesh))
     [VOL_cmpts,SA_cmpts,SAu_cmpts,VOL_allcmpts,VF_cmpts,SoV_cmpts] ...
         = GET_VOL_SA(mymesh,experi_common.gdir);
     
-    %PLOT_GEOMETRY_INFO(cmpts_bdys_mat,OUT_cmpts_index,IN_cmpts_index,ECS_cmpts_index,VOL_cmpts,SA_cmpts,SAu_cmpts);
+    % PLOT_GEOMETRY_INFO(cmpts_bdys_mat,OUT_cmpts_index,IN_cmpts_index,ECS_cmpts_index,VOL_cmpts,SA_cmpts,SAu_cmpts);
     
     
     
@@ -98,14 +98,32 @@ if (~isempty(mymesh))
     else
         % BTPDE
         if (~isempty(experi_btpde))
-            [grad_dir, signal_allcmpts] ...
-                = BTPDE_signal(experi_btpde,mymesh,DIFF_cmpts,kappa_bdys,IC_cmpts);
-            % load('pyramidal_dendrites_signal.mat')
-            real_signal_allcompts = real(signal_allcmpts);
-            real_signal_allcompts_normalized = real_signal_allcompts(:,1:length(experi_btpde.bvalues))./real_signal_allcompts(:,1);
-            for i=2:3
-                PLOT_3Dsignal(grad_dir, real_signal_allcompts_normalized(:,i),experi_btpde.bvalues(i));    
-            end            
+            
+            t = cputime;
+            [points_gdir,SIG_BTPDE_cmpts_alldir,SIG_BTPDE_allcmpts_alldir] ...
+                = SIG_BTPDE_HARDI(experi_btpde,mymesh,DIFF_cmpts,kappa_bdys,IC_cmpts, fname_params_cells(14:end-3));
+            ctime_btpde_hardi = cputime - t;
+            save('pyramidal_dendrites_signal_d10_D43_5bvalues_180gdir_0')
+            
+            nexperi = length(experi_btpde.sdeltavec);
+            nb = size(experi_btpde.bvalues,2);
+            all_sh_coeff = zeros(16, nb);
+            all_diff = zeros(length(SIG_BTPDE_allcmpts_alldir), nb);
+            for iexperi = 1:nexperi
+                for ib = 2:nb
+                    S0 = sum((IC_cmpts.*VOL_cmpts));                 
+                    % bv = experi_btpde.bvalues(iexperi,ib);
+                    % title_str = ['BTPDE. All Cmpts. ','Experi ',...
+                    %    num2str(iexperi),', b= ',num2str(bv)];
+                    [sh_coeff, diff] = shcoeff(points_gdir,squeeze(real(SIG_BTPDE_allcmpts_alldir(:,iexperi,ib)))/S0);
+                    all_sh_coeff(:, ib) = sh_coeff;
+                    all_diff(:, ib) = diff;
+                    % PLOT_HARDI_PT(points_gdir,squeeze(real(SIG_BTPDE_allcmpts_alldir(:,iexperi,ib)))/S0,title_str);
+                    % PLOT_HARDI(points_gdir,squeeze(real(SIG_BTPDE_allcmpts_alldir(:,iexperi,ib)))/S0,title_str);                   
+                end
+            end
+            save('pyramidal_dendrites_signal_d10_D43_5bvalues_180gdir')
+        
         end
         %HADC
         if (~isempty(experi_hadc))
